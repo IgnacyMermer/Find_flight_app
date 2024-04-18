@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lot_recrutation_app/HomePage/AirportsFields.dart';
+import 'package:lot_recrutation_app/HomePage/ChooseDatesRange.dart';
+import 'package:lot_recrutation_app/HomePage/ChooseFlightDate.dart';
+import 'package:lot_recrutation_app/HomePage/PassengersData.dart';
+import 'package:lot_recrutation_app/Providers/HomePageProvider.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,6 +16,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   bool oneWay = false;
+  FocusNode focusNodeFromDate=FocusNode(), focusNodeToDate=FocusNode();
 
   void changeSelectedManyWay(int position) {
     setState(() {
@@ -17,12 +24,14 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  TextEditingController flyFromController = new TextEditingController();
-  TextEditingController flyToController = new TextEditingController();
-
+  void removeFocuses(){
+    focusNodeFromDate.unfocus();
+    focusNodeToDate.unfocus();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final homePageProvider = Provider.of<HomePageProvider>(context);
     return PopScope(
       canPop: false,
       onPopInvoked: (didPop) async {
@@ -91,45 +100,13 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
-                padding: EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        style: TextStyle(fontSize: 20,color: Colors.blueGrey[800]),
-                        decoration: InputDecoration(
-                          fillColor: Colors.white,
-                          labelText: 'Skąd',
-                          filled: true,
-                          labelStyle: TextStyle(color: Colors.blueGrey[800]),
-                        ),
-                        controller: flyFromController,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: (){},
-                      icon: Icon(Icons.swap_horizontal_circle,
-                      size: 40,)
-                    ),
-                    Expanded(
-                      child: TextFormField(
-                        style: TextStyle(fontSize: 20,color: Colors.blueGrey[800]),
-                        decoration: InputDecoration(
-                          fillColor: Colors.white,
-                          labelText: 'Dokąd',
-                          filled: true,
-                          labelStyle: TextStyle(color: Colors.blueGrey[800]),
-                        ),
-                        controller: flyToController,
-                      ),
-                    ),
-                  ],
-                ),
-              )
+
+              AirportFields(focus1: focusNodeFromDate, focus2: focusNodeToDate),
+
+              oneWay?ChooseFlightDate(removeFocuses: removeFocuses)
+                  :ChooseDatesRange(removeFocuses: removeFocuses),
+
+              PassengersData()
 
             ],
           ),
