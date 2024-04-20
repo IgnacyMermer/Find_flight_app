@@ -11,16 +11,18 @@ class ChooseDatesRange extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homePageProvider = Provider.of<HomePageProvider>(context);
-    return Placeholder(
-      child: Container(
+    return Container(
         decoration: BoxDecoration(
-          color: Colors.blue,
+          color: Colors.white60,
         ),
         padding: EdgeInsets.all(20),
         child: Row(
           children: [
             Expanded(
                 child: ElevatedButton(
+                  style: ButtonStyle(
+                      padding: MaterialStateProperty.all(EdgeInsets.all(15))
+                  ),
                   onPressed: ()async{
                     FocusScope.of(context).unfocus();
                     removeFocuses();
@@ -28,11 +30,15 @@ class ChooseDatesRange extends StatelessWidget {
                     homePageProvider.fromDate=map['fromDate'];
                     homePageProvider.toDate=map['toDate'];
                   },
-                  child: Text(homePageProvider.fromDate!=null?homePageProvider.fromDate?.toLocal().toString().substring(0,10)??'':'Data wylotu'),
+                  child: Text(homePageProvider.fromDate!=null?homePageProvider.fromDate?.toLocal().toString().substring(0,10)??'':'Data wylotu',
+                      style: TextStyle(fontSize: 20)),
                 )
             ),
             Expanded(
                 child: ElevatedButton(
+                  style: ButtonStyle(
+                      padding: MaterialStateProperty.all(EdgeInsets.all(15))
+                  ),
                   onPressed: ()async{
                     FocusScope.of(context).unfocus();
                     removeFocuses();
@@ -40,12 +46,13 @@ class ChooseDatesRange extends StatelessWidget {
                     homePageProvider.fromDate=map['fromDate'];
                     homePageProvider.toDate=map['toDate'];
                   },
-                  child: Text(homePageProvider.toDate!=null?homePageProvider.toDate?.toLocal().toString().substring(0,10)??'':'Data wylotu'),
+                  child: Text(homePageProvider.toDate!=null?homePageProvider.toDate?.toLocal().toString().substring(0,10)??'':'Data wylotu',
+                      style: TextStyle(fontSize: 20)),
                 )
             )
           ],
         ),
-      ),
+
     );
   }
 
@@ -56,6 +63,8 @@ class ChooseDatesRange extends StatelessWidget {
       initialDateRange: fromDate!=null&&toDate!=null?DateTimeRange(start: fromDate??DateTime.now(), end: toDate??DateTime.now())
       :null,
       context: context,
+      barrierColor: Colors.black,
+
     );
 
     DateTime? newFromDate = fromDate, newToDate = toDate;

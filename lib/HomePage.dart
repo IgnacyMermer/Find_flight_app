@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:lot_recrutation_app/Flights/SearchPage.dart';
@@ -6,6 +8,7 @@ import 'package:lot_recrutation_app/HomePage/ChooseDatesRange.dart';
 import 'package:lot_recrutation_app/HomePage/ChooseFlightDate.dart';
 import 'package:lot_recrutation_app/HomePage/PassengersData.dart';
 import 'package:lot_recrutation_app/Providers/HomePageProvider.dart';
+import 'package:lot_recrutation_app/Providers/TokenProvider.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -22,22 +25,32 @@ class _HomePageState extends State<HomePage> {
   TextEditingController flyFromController = new TextEditingController();
   TextEditingController flyToController = new TextEditingController();
   bool showFromWhereCities = false, showToWhereCities = false;
+  DateTime lastCall = DateTime.now();
+  Timer? timer;
 
   Future<List<Map<String, String>>>? cities;
 
   void flyFromListener(){
-    setState(() {
-      showFromWhereCities=true;
-      showToWhereCities=false;
-      cities = getCities(flyFromController.text);
+    timer?.cancel();
+    timer = Timer(Duration(seconds: 1), ()
+    {
+      setState(() {
+        showFromWhereCities = true;
+        showToWhereCities = false;
+        cities = getCities(flyFromController.text);
+      });
     });
   }
 
   void flyToListener(){
-    setState(() {
-      showFromWhereCities=false;
-      showToWhereCities=true;
-      cities = getCities(flyToController.text);
+    timer?.cancel();
+    timer = Timer(Duration(seconds: 1), ()
+    {
+      setState(() {
+        showFromWhereCities = false;
+        showToWhereCities = true;
+        cities = getCities(flyToController.text);
+      });
     });
   }
 
@@ -67,6 +80,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
 
     final homePageProvider = Provider.of<HomePageProvider>(context);
+
     void swapController(){
       setState(() {
         var temp = flyFromController.text;
@@ -106,7 +120,7 @@ class _HomePageState extends State<HomePage> {
                         width: 150,
                         height: 50,
                         decoration: BoxDecoration(
-                          color: Colors.blue,
+                          color: Colors.white60,
                         ),
                       ),
                     ),
@@ -120,7 +134,7 @@ class _HomePageState extends State<HomePage> {
                               alignment: Alignment.center,
                               child: Text(
                                 "W jedną stronę",
-                                style: TextStyle(color: Colors.white,
+                                style: TextStyle(color: Colors.black,
                                     fontSize: 20, fontWeight: FontWeight.w600
                                 ),
                               ),
@@ -135,7 +149,7 @@ class _HomePageState extends State<HomePage> {
                               alignment: Alignment.center,
                               child: Text(
                                 "W dwie strony",
-                                style: TextStyle(color: Colors.white,
+                                style: TextStyle(color: Colors.black,
                                     fontSize: 20, fontWeight: FontWeight.w600
                                 ),
                               ),
@@ -156,17 +170,26 @@ class _HomePageState extends State<HomePage> {
                       AirportFields(focus1: focusNodeFromDate, focus2: focusNodeToDate,
                       flyFromController: flyFromController, flyToController: flyToController,
                       swapController: swapController),
-                      SizedBox(height: 20),
                       oneWay?ChooseFlightDate(removeFocuses: removeFocuses)
                           :ChooseDatesRange(removeFocuses: removeFocuses),
 
                       PassengersData(),
 
-                      ElevatedButton(
-                        onPressed: (){
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const SearchPage()));
-                        },
-                        child: Text('Szukaj'))
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white60,
+                          borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(10))
+                        ),
+                        padding: EdgeInsets.fromLTRB(20, 20, 20, 60),
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            padding: MaterialStateProperty.all(EdgeInsets.all(15))
+                          ),
+                          onPressed: (){
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const SearchPage()));
+                          },
+                          child: Text('Szukaj', style: TextStyle(fontSize: 25)))
+                      )
 
                     ],
                   ),
@@ -263,10 +286,23 @@ class _HomePageState extends State<HomePage> {
   Future<List<Map<String, String>>> getCities(String keyword)async{
     Dio dio = Dio();
     try {
+
+      print(TokenProvider.token_);
+      print(TokenProvider.tokenCreatedTime_);
+      print(DateTime.now());
+      if(TokenProvider.token_==null){
+        TokenProvider.token_ = await TokenProvider.createToken(dio);
+        TokenProvider.tokenCreatedTime_=DateTime.now();
+      }
+      else if((TokenProvider.tokenCreatedTime_??DateTime(2023, 1, 1)).isBefore(DateTime.now().subtract(Duration(minutes: 30)))){
+        TokenProvider.token_ = await TokenProvider.createToken(dio);
+        TokenProvider.tokenCreatedTime_=DateTime.now();
+      }
+
       final data = await dio.get(
           'https://test.api.amadeus.com/v1/reference-data/locations?subType=AIRPORT&keyword=${keyword}',
           options: Options(headers: {
-            'Authorization': 'Bearer ouNuCGGcAcYyy83i6Z9BabUtIwpP'
+            'Authorization': 'Bearer ${TokenProvider.token_}'
           }));
       List<dynamic> responseData = data.data['data'];
       List<Map<String, String>> cities = [];

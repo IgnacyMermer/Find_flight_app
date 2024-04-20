@@ -8,28 +8,29 @@ class PassengersData extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homePageProvider = Provider.of<HomePageProvider>(context);
-    return Placeholder(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.blue,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white60,
+      ),
+      padding: EdgeInsets.all(20),
+      child: ElevatedButton(
+        style: ButtonStyle(
+            padding: MaterialStateProperty.all(EdgeInsets.all(15))
         ),
-        padding: EdgeInsets.all(20),
-        child: ElevatedButton(
-          child: Text('Dane podróżnych'),
-          onPressed: ()async{
+        child: Text('Dane podróżnych', style: TextStyle(fontSize: 25)),
+        onPressed: ()async{
 
-            Map<String, int> userChosenPassengersData = await passengersDataConfigurator(context, {'adults': homePageProvider.adults,
-              'teenagers': homePageProvider.teenagers, 'children': homePageProvider.children,
-              'babies': homePageProvider.babies, 'flightClass': homePageProvider.flightClass_});
+          Map<String, int> userChosenPassengersData = await passengersDataConfigurator(context, {'adults': homePageProvider.adults,
+            'teenagers': homePageProvider.teenagers, 'children': homePageProvider.children,
+            'babies': homePageProvider.babies, 'flightClass': homePageProvider.flightClass_});
 
-            homePageProvider.adults=userChosenPassengersData['adults']!;
-            homePageProvider.teenagers=userChosenPassengersData['teenagers']!;
-            homePageProvider.children=userChosenPassengersData['children']!;
-            homePageProvider.babies=userChosenPassengersData['babies']!;
-            homePageProvider.flightClass=userChosenPassengersData['flightClass']!;
+          homePageProvider.adults=userChosenPassengersData['adults']!;
+          homePageProvider.teenagers=userChosenPassengersData['teenagers']!;
+          homePageProvider.children=userChosenPassengersData['children']!;
+          homePageProvider.babies=userChosenPassengersData['babies']!;
+          homePageProvider.flightClass=userChosenPassengersData['flightClass']!;
 
-          },
-        ),
+        },
       ),
     );
   }

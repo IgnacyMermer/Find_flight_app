@@ -16,7 +16,7 @@ class AirportFields extends StatelessWidget {
     final homePageProvider = Provider.of<HomePageProvider>(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.blue,
+        color: Colors.white60,
       ),
       padding: EdgeInsets.all(20),
       child: Column(
@@ -42,7 +42,7 @@ class AirportFields extends StatelessWidget {
               onPressed: (){
                 swapController();
               },
-              icon: Icon(Icons.swap_horizontal_circle, size: 40,)
+              icon: Icon(Icons.swap_horizontal_circle, size: 40, color: Colors.blueGrey,)
           ),
           //Expanded(
             //child:

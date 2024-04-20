@@ -10,22 +10,24 @@ class ChooseFlightDate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homePageProvider = Provider.of<HomePageProvider>(context);
-    return Placeholder(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.blue,
-        ),
-        padding: EdgeInsets.all(20),
-          child: ElevatedButton(
-            onPressed: ()async{
-              //FocusScope.of(context).unfocus();
-              removeFocuses();
-              DateTime? newOneFlightDate = await pickFromDate(context, homePageProvider.oneFlightDate);
-              homePageProvider.oneFlightDate=newOneFlightDate;
-            },
-            child: Text(homePageProvider.oneFlightDate!=null?homePageProvider.oneFlightDate?.toLocal().toString().substring(0,10)??'':'Data wylotu'),
-          )
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white60,
       ),
+      padding: EdgeInsets.all(20),
+        child: ElevatedButton(
+          style: ButtonStyle(
+              padding: MaterialStateProperty.all(EdgeInsets.all(15))
+          ),
+          onPressed: ()async{
+            //FocusScope.of(context).unfocus();
+            removeFocuses();
+            DateTime? newOneFlightDate = await pickFromDate(context, homePageProvider.oneFlightDate);
+            homePageProvider.oneFlightDate=newOneFlightDate;
+          },
+          child: Text(homePageProvider.oneFlightDate!=null?homePageProvider.oneFlightDate?.toLocal().toString().substring(0,10)??'':'Data wylotu',
+              style: TextStyle(fontSize: 25)),
+        )
     );
   }
 

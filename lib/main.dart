@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:lot_recrutation_app/HomePage.dart';
+import 'package:lot_recrutation_app/Providers/FlightsProvider.dart';
 import 'package:lot_recrutation_app/Providers/HomePageProvider.dart';
 import 'package:provider/provider.dart';
 
@@ -15,13 +16,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context)=>HomePageProvider())
+        ChangeNotifierProvider(create: (context)=>HomePageProvider()),
+        ChangeNotifierProvider(create: (context)=>FlightsProvider())
       ],
       child: MaterialApp(
         title: 'LOT recruitment app',
         theme: ThemeData(
           brightness: Brightness.dark,
-          scaffoldBackgroundColor: Colors.blueGrey[400],
+          scaffoldBackgroundColor: Colors.blueGrey[200],
           listTileTheme: ListTileThemeData(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
               tileColor: Colors.grey
