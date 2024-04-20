@@ -3,11 +3,11 @@ import 'FlightSegment.dart';
 
 class Flight{
 
-  String lastTicketingDate;
+  String lastTicketingDate, time, price, currency, totalPrice;
   int numberOfBookableSeats;
   List<FlightSegment> segments;
 
-  Flight(this.lastTicketingDate, this.numberOfBookableSeats,
-    this.segments);
+  Flight(this.lastTicketingDate, this.numberOfBookableSeats, this.time, this.price,
+    this.currency, this.totalPrice, this.segments);
 
 }

@@ -286,10 +286,6 @@ class _HomePageState extends State<HomePage> {
   Future<List<Map<String, String>>> getCities(String keyword)async{
     Dio dio = Dio();
     try {
-
-      print(TokenProvider.token_);
-      print(TokenProvider.tokenCreatedTime_);
-      print(DateTime.now());
       if(TokenProvider.token_==null){
         TokenProvider.token_ = await TokenProvider.createToken(dio);
         TokenProvider.tokenCreatedTime_=DateTime.now();

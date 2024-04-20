@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:lot_recrutation_app/Flights/FlightDetails.dart';
 import 'package:lot_recrutation_app/Models/Flight.dart';
 import 'package:lot_recrutation_app/Models/FlightSegment.dart';
 import 'package:lot_recrutation_app/Providers/FlightsProvider.dart';
@@ -31,6 +32,9 @@ class _SearchPageState extends State<SearchPage> {
         Navigator.of(context).pop();
       },
       child: Scaffold(
+        appBar: AppBar(
+          title: Text('Znalezione loty'),
+        ),
         body: Container(
           child: ListView(
             children: [
@@ -47,73 +51,103 @@ class _SearchPageState extends State<SearchPage> {
                       padding: EdgeInsets.all(20),
                       child: ListView(
                         shrinkWrap: true,
+                        physics: ClampingScrollPhysics(),
                         children: snapshot.data!.map((e) {
                           return Container(
-                            margin: EdgeInsets.all(10),
+                            margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
                             padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: Colors.blueGrey,
                               borderRadius: BorderRadius.all(Radius.circular(20))
                             ),
-                            child: Column(
+                            child: ListView(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
                               children: [
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: Text(e.segments[0].departureTerminal??'',
-                                          style: TextStyle(color: Colors.black))
-                                    ),
-                                    Expanded(
-                                      child: Text(e.segments[e.segments.length-1].arrivalTerminal??'',
-                                          style: TextStyle(color: Colors.black))
-                                    )
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Icon(
-                                        Icons.airplanemode_active
+                                      child: Column(
+                                        children: [
+                                          Icon(
+                                              Icons.airplanemode_active
+                                          ),
+                                          Text(
+                                            e.segments[0].departureTime.toString()
+                                              .substring(0, 16).replaceAll('T', ' '),
+                                            style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w500),
+                                            textAlign: TextAlign.center,
+                                          )
+                                        ],
                                       )
                                     ),
                                     Expanded(
-                                      child: Text('Czas', style: TextStyle(color: Colors.black))
+                                      child: Text('Czas: ${e.time.replaceAll('PT', '')} '
+                                          '${e.segments.length!=0?' - ${e.segments.length} przesiadki':''}',
+                                      style: TextStyle(color: Colors.black, fontSize: 17),
+                                      textAlign: TextAlign.center)
                                     ),
                                     Expanded(
-                                      child: Icon(
-                                        Icons.control_point_sharp
-                                      ),
+                                      child: Column(
+                                        children: [
+                                          Icon(
+                                              Icons.control_point_sharp
+                                          ),
+                                          Text(
+                                            e.segments[e.segments.length-1].arrivalTime.toString()
+                                                .substring(0, 16).replaceAll('T', ' '),
+                                            style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w500),
+                                            textAlign: TextAlign.center,
+                                          )
+                                        ],
+                                      )
                                     )
                                   ],
                                 ),
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: Text('Samolot typ', style: TextStyle(color: Colors.black))
+                                      child: Text('Samolot typ: ${e.segments.map((element) {
+                                        return element.airplaneType??'';
+                                      })}',
+                                        style: TextStyle(color: Colors.black, fontSize: 15))
                                     ),
                                     Expanded(
                                       child: ElevatedButton(
                                         onPressed: (){
-
+                                          flightsProvider.flightDetails=e;
+                                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const FlightDetails()));
                                         },
-                                        child: Text('Szczegóły lotu', style: TextStyle(color: Colors.black)),
+                                        child: Text('Szczegóły lotu', style: TextStyle(color: Colors.white)),
                                       )
                                     )
                                   ],
                                 ),
                                 Row(
                                   children: [
-                                    Column(
-                                      children: [
-                                        Text('Bilety dostępne do', style: TextStyle(color: Colors.black)),
-                                        Text(e.lastTicketingDate, style: TextStyle(color: Colors.black))
-                                      ]
+                                    Expanded(
+                                      child: Column(
+                                          children: [
+                                            Text('Bilety dostępne do',
+                                                style: TextStyle(color: Colors.black, fontSize: 18),
+                                                textAlign: TextAlign.center),
+                                            Text(e.lastTicketingDate,
+                                                style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
+                                                textAlign: TextAlign.center)
+                                          ]
+                                      ),
                                     ),
-                                    Column(
-                                      children: [
-                                        Text('Cena za jedną osobę', style: TextStyle(color: Colors.black)),
-                                        Text('(Cena)', style: TextStyle(color: Colors.black))
-                                      ],
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          Text('Cena za jedną osobę',
+                                            style: TextStyle(color: Colors.black, fontSize: 18),
+                                            textAlign: TextAlign.center),
+                                          Text('${e.totalPrice} ${e.currency}',
+                                              style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
+                                              textAlign: TextAlign.center)
+                                        ],
+                                      )
                                     )
                                   ],
                                 )
@@ -129,7 +163,6 @@ class _SearchPageState extends State<SearchPage> {
                   }
                 })
               )
-
             ],
           ),
         ),
@@ -161,23 +194,26 @@ class _SearchPageState extends State<SearchPage> {
           }));
 
       List<Flight> flights = [];
-      print(result);
 
       List<dynamic> data = result.data['data'];
       data.forEach((element) {
         List<FlightSegment> segments = [];
         element['itineraries'][0]['segments'].forEach((elementSegm) {
           segments.add(
-              FlightSegment(elementSegm['departure']['iataCode'],
-                  elementSegm['departure']['terminal'],
-                  elementSegm['departure']['at'],
-                  elementSegm['arrival']['iataCode'],
-                  elementSegm['arrival']['Terminal'],
-                  elementSegm['arrival']['at'],
-                  elementSegm['duration']));
+              FlightSegment(elementSegm['departure']['iataCode'].toString(),
+                  elementSegm['departure']['terminal'].toString(),
+                  elementSegm['departure']['at'].toString(),
+                  elementSegm['arrival']['iataCode'].toString(),
+                  elementSegm['arrival']['terminal'].toString(),
+                  elementSegm['arrival']['at'].toString(),
+                  elementSegm['duration'].toString(),
+                  elementSegm['aircraft']['code'].toString()
+              ));
         });
 
-        flights.add(Flight(element['lastTicketingDate'], element['numberOfBookableSeats'], segments));
+        flights.add(Flight(element['lastTicketingDate'], element['numberOfBookableSeats'],
+            element['itineraries'][0]['duration'], element['price']['base'],
+            element['price']['currency'], element['price']['total'], segments));
       });
 
       return flights;
