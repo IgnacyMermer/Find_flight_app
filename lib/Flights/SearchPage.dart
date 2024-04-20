@@ -18,7 +18,35 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+
+  late ScrollController scrollController;
+  Future<List<Flight>>? flights;
+  bool gettingNewFlights=false;
   
+  int page = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    scrollController = ScrollController();
+    scrollController.addListener(()=>onScroll(context));
+    final homePageProvider = Provider.of<HomePageProvider>(context, listen: false);
+    flights = getFlights(homePageProvider.airportFromId??'', homePageProvider.airportToId??'',
+        homePageProvider.oneFlightDate.toString().substring(0, 10), homePageProvider.adults);
+  }
+
+  void onScroll(BuildContext context) {
+    if (scrollController.position.pixels == scrollController.position.maxScrollExtent&&(!gettingNewFlights)) {
+      setState(() {
+        gettingNewFlights=true;
+        page+=1;
+        final homePageProvider = Provider.of<HomePageProvider>(context, listen: false);
+        flights = getFlights(homePageProvider.airportFromId??'', homePageProvider.airportToId??'',
+            homePageProvider.oneFlightDate.toString().substring(0, 10), homePageProvider.adults);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final homePageProvider = Provider.of<HomePageProvider>(context);
@@ -37,19 +65,20 @@ class _SearchPageState extends State<SearchPage> {
         ),
         body: Container(
           child: ListView(
+            controller: scrollController,
             children: [
 
               SizedBox(height: 20),
 
               FutureBuilder(
-                future: getFlights(homePageProvider.airportFromId??'', homePageProvider.airportToId??'',
-                homePageProvider.oneFlightDate.toString().substring(0, 10), homePageProvider.adults),
+                future: flights,
                 builder: ((BuildContext context, AsyncSnapshot<List<Flight>> snapshot){
                   if(snapshot.hasData){
                     //flightsProvider.flights=snapshot.data!;
                     return Container(
                       padding: EdgeInsets.all(20),
                       child: ListView(
+
                         shrinkWrap: true,
                         physics: ClampingScrollPhysics(),
                         children: snapshot.data!.map((e) {
@@ -60,9 +89,9 @@ class _SearchPageState extends State<SearchPage> {
                               color: Colors.blueGrey,
                               borderRadius: BorderRadius.all(Radius.circular(20))
                             ),
-                            child: ListView(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
+                            child: Column(
+                              //shrinkWrap: true,
+                              //physics: NeverScrollableScrollPhysics(),
                               children: [
                                 Row(
                                   children: [
@@ -83,7 +112,7 @@ class _SearchPageState extends State<SearchPage> {
                                     ),
                                     Expanded(
                                       child: Text('Czas: ${e.time.replaceAll('PT', '')} '
-                                          '${e.segments.length!=0?' - ${e.segments.length} przesiadki':''}',
+                                          '${e.segments.length>1?' - ${e.segments.length-1} ${e.segments.length-1==1?'przesiadka':'przesiadki'}':''}',
                                       style: TextStyle(color: Colors.black, fontSize: 17),
                                       textAlign: TextAlign.center)
                                     ),
@@ -188,7 +217,7 @@ class _SearchPageState extends State<SearchPage> {
       final result = await dio.get(
           'https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=${departureId
               .substring(1)}&destinationLocationCode=${arrivalId.substring(
-              1)}&departureDate=${date}&adults=${adults}&nonStop=false&max=250',
+              1)}&departureDate=${date}&adults=${adults}&nonStop=false&max=${page*10}',
           options: Options(headers: {
             'Authorization': 'Bearer ${TokenProvider.token_}'
           }));
@@ -215,7 +244,7 @@ class _SearchPageState extends State<SearchPage> {
             element['itineraries'][0]['duration'], element['price']['base'],
             element['price']['currency'], element['price']['total'], segments));
       });
-
+      gettingNewFlights=false;
       return flights;
     }
     catch(e){
