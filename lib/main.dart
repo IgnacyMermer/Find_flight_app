@@ -4,8 +4,11 @@ import 'package:lot_recrutation_app/HomePage.dart';
 import 'package:lot_recrutation_app/Providers/FlightsProvider.dart';
 import 'package:lot_recrutation_app/Providers/HomePageProvider.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
+  //sqfliteFfiInit();
+  //databaseFactory = databaseFactoryFfi;
   runApp(const MyApp());
 }
 

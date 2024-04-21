@@ -1,17 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lot_recrutation_app/Database/Database.dart';
+import 'package:lot_recrutation_app/Flights/SearchPage.dart';
 import 'package:lot_recrutation_app/Models/Flight.dart';
 import 'package:lot_recrutation_app/Providers/FlightsProvider.dart';
 import 'package:provider/provider.dart';
 
 class FlightDetails extends StatefulWidget {
-  const FlightDetails({super.key});
+  final bool toTarget;
+  final Future<List<Flight>> Function(String, String, String, int, int) getFlights;
+  const FlightDetails({super.key, required this.toTarget, required this.getFlights});
 
   @override
   State<FlightDetails> createState() => _FlightDetailsState();
 }
 
 class _FlightDetailsState extends State<FlightDetails> {
+
+  bool addedToFavourite=false;
+
   @override
   Widget build(BuildContext context) {
     final flightsProvider = Provider.of<FlightsProvider>(context);
@@ -46,7 +53,7 @@ class _FlightDetailsState extends State<FlightDetails> {
                         Text(flight?.segments[0].departureTime?.substring(0, 16).replaceAll('T', ' ')??'',
                             style: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w500),
                             textAlign: TextAlign.center),
-                        Text('Terminal: ${flight?.segments[0].departureTerminal}',
+                        Text('Terminal: ${flight?.segments[0].departureTerminal??''}',
                         style: TextStyle(color: Colors.black, fontSize: 16),
                         textAlign: TextAlign.center)
                       ],
@@ -77,7 +84,7 @@ class _FlightDetailsState extends State<FlightDetails> {
                           Text(flight?.segments[(flight.segments.length)-1].arrivalTime?.substring(0, 16).replaceAll('T', ' ')??'',
                               style: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w500),
                               textAlign: TextAlign.center),
-                          Text('Terminal: ${flight?.segments[flight.segments.length-1].arrivalTerminal}',
+                          Text('Terminal: ${flight?.segments[flight.segments.length-1].arrivalTerminal??''}',
                               style: TextStyle(color: Colors.black, fontSize: 16),
                               textAlign: TextAlign.center)
                         ],
@@ -100,7 +107,42 @@ class _FlightDetailsState extends State<FlightDetails> {
 
               Text((flight?.numberOfBookableSeats??0)==0?'Niedostępne':'Dostępne jeszcze: ${flight?.numberOfBookableSeats} '
                   '${flight?.numberOfBookableSeats==1?'bilet':((flight?.numberOfBookableSeats??0)<5?'bilety':'biletów')}',
-              style: TextStyle(color: Colors.black, fontSize: 16))
+              style: TextStyle(color: Colors.black, fontSize: 18)),
+
+              SizedBox(height: 20),
+
+              widget.toTarget&&(flightsProvider.toAndFromFlights??false)?ElevatedButton(
+                style: ButtonStyle(
+                  padding: MaterialStateProperty.all(EdgeInsets.all(15))
+                ),
+                onPressed: (){
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>SearchPage(toTarget: false,
+                      oneWayFlight: false, getFlights: widget.getFlights)));
+                },
+                child: Text('Znajdź lot powrotny', style: TextStyle(fontSize: 22))
+              ):SizedBox(),
+
+              SizedBox(height: widget.toTarget&&(flightsProvider.toAndFromFlights??false)?20:0),
+
+              (!addedToFavourite)?ElevatedButton(
+                style: ButtonStyle(
+                    padding: MaterialStateProperty.all(EdgeInsets.all(15))
+                ),
+                onPressed: ()async{
+                  await LocalDatabase.checkDatabase();
+                  await LocalDatabase.insertFlight(flight);
+                  setState(() {
+                    addedToFavourite=true;
+                  });
+                },
+                child: Text('Zapisz lot', style: TextStyle(fontSize: 22))
+              ):SizedBox(),
+
+              addedToFavourite?Text(
+                'Lot zapisany',
+                style: TextStyle(fontSize: 35, color: Colors.green, fontWeight: FontWeight.w600),
+                textAlign: TextAlign.center,
+              ):SizedBox()
 
             ],
           ),

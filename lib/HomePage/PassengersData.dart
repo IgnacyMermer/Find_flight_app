@@ -3,7 +3,8 @@ import 'package:lot_recrutation_app/Providers/HomePageProvider.dart';
 import 'package:provider/provider.dart';
 
 class PassengersData extends StatelessWidget {
-  const PassengersData({super.key});
+  final void Function() removeFocuses;
+  const PassengersData({super.key, required this.removeFocuses});
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +20,8 @@ class PassengersData extends StatelessWidget {
         ),
         child: Text('Dane podróżnych', style: TextStyle(fontSize: 25)),
         onPressed: ()async{
+
+          removeFocuses();
 
           Map<String, int> userChosenPassengersData = await passengersDataConfigurator(context, {'adults': homePageProvider.adults,
             'teenagers': homePageProvider.teenagers, 'children': homePageProvider.children,

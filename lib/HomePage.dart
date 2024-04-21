@@ -2,11 +2,16 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:lot_recrutation_app/Database/Database.dart';
+import 'package:lot_recrutation_app/Flights/Flights.dart';
+import 'package:lot_recrutation_app/Flights/SavesFlights.dart';
 import 'package:lot_recrutation_app/Flights/SearchPage.dart';
 import 'package:lot_recrutation_app/HomePage/AirportsFields.dart';
 import 'package:lot_recrutation_app/HomePage/ChooseDatesRange.dart';
 import 'package:lot_recrutation_app/HomePage/ChooseFlightDate.dart';
 import 'package:lot_recrutation_app/HomePage/PassengersData.dart';
+import 'package:lot_recrutation_app/Models/Flight.dart';
+import 'package:lot_recrutation_app/Providers/FlightsProvider.dart';
 import 'package:lot_recrutation_app/Providers/HomePageProvider.dart';
 import 'package:lot_recrutation_app/Providers/TokenProvider.dart';
 import 'package:provider/provider.dart';
@@ -80,6 +85,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
 
     final homePageProvider = Provider.of<HomePageProvider>(context);
+    final flightsProvider = Provider.of<FlightsProvider>(context);
 
     void swapController(){
       setState(() {
@@ -173,7 +179,7 @@ class _HomePageState extends State<HomePage> {
                       oneWay?ChooseFlightDate(removeFocuses: removeFocuses)
                           :ChooseDatesRange(removeFocuses: removeFocuses),
 
-                      PassengersData(),
+                      PassengersData(removeFocuses: removeFocuses),
 
                       Container(
                         decoration: BoxDecoration(
@@ -186,7 +192,26 @@ class _HomePageState extends State<HomePage> {
                             padding: MaterialStateProperty.all(EdgeInsets.all(15))
                           ),
                           onPressed: (){
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const SearchPage()));
+                            Future<List<Flight>> getFlights(String departureId, String arrivalId, String date,
+                                int adults, int page)async {
+                              final result = await Flights.getFlights(departureId, arrivalId, date, adults, page);
+                              homePageProvider.gettingFlights=false;
+                              return result;
+
+                            }
+                            if(homePageProvider.airportFromId!=null&&
+                                homePageProvider.airportToId!=null&&
+                                ((oneWay&&homePageProvider.oneFlightDate!=null)||
+                                    ((!oneWay)&&homePageProvider.toDate!=null&&
+                                    homePageProvider.fromDate!=null))) {
+
+                              flightsProvider.toAndFromFlights = !oneWay;
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      SearchPage(toTarget: true,
+                                          oneWayFlight: oneWay, getFlights: getFlights)
+                              ));
+                            }
                           },
                           child: Text('Szukaj', style: TextStyle(fontSize: 25)))
                       )
@@ -276,6 +301,37 @@ class _HomePageState extends State<HomePage> {
                   ):SizedBox(),
                 ],
               ),
+              SizedBox(height: 15),
+
+              ElevatedButton(
+                style: ButtonStyle(
+                    padding: MaterialStateProperty.all(EdgeInsets.all(15))
+                ),
+                onPressed: (){
+                  if(homePageProvider.airportFromId!=null&&
+                      homePageProvider.airportToId!=null&&
+                      ((oneWay&&homePageProvider.oneFlightDate!=null)||
+                          ((!oneWay)&&homePageProvider.toDate!=null&&
+                              homePageProvider.fromDate!=null))) {
+
+                    flightsProvider.toAndFromFlights = !oneWay;
+                    Future<List<Flight>> getFlights(String departureId, String arrivalId, String date,
+                        int adults, int page)async {
+                      await LocalDatabase.checkDatabase();
+                      final result = await LocalDatabase.getData();
+                      homePageProvider.gettingFlights=false;
+                      return result;
+
+                    }
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            SearchPage(toTarget: false, oneWayFlight: true,
+                                getFlights: getFlights))
+                    );
+                  }
+                },
+                child: Text('Zapisane loty', style: TextStyle(fontSize: 25))
+              )
             ],
           ),
         ),

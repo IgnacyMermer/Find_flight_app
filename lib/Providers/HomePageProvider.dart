@@ -6,7 +6,7 @@ class HomePageProvider extends ChangeNotifier{
   //TextEditingController flyToController_ = new TextEditingController();
   int adults_=1, teenagers_=0, children_=0, babies_=0, flightClass_=-1;
   String airport_='', airportShortcut_='';
-  bool isLoadingCities_=false;
+  bool isLoadingCities_=false, gettingFlights_=false;
 
   String? airportFromId_, airportToId_;
 
@@ -25,6 +25,7 @@ class HomePageProvider extends ChangeNotifier{
   bool get isLoadingCities=>isLoadingCities_;
   String? get airportFromId=>airportFromId_;
   String? get airportToId=>airportToId_;
+  bool get gettingFlights=>gettingFlights_;
 
 
   set fromDate(DateTime? newFromDate){
@@ -99,6 +100,11 @@ class HomePageProvider extends ChangeNotifier{
 
   set airportToId(String? newAirportToId){
     airportToId_=newAirportToId;
+    notifyListeners();
+  }
+
+  set gettingFlights(bool newGettingFlights){
+    gettingFlights_=newGettingFlights;
     notifyListeners();
   }
 

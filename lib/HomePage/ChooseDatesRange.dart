@@ -3,10 +3,8 @@ import 'package:lot_recrutation_app/Providers/HomePageProvider.dart';
 import 'package:provider/provider.dart';
 
 class ChooseDatesRange extends StatelessWidget {
-  //final Future<Map<String, DateTime?>> Function(BuildContext context, DateTime? fromDate, DateTime? toDate) pickDateRange;
   final void Function() removeFocuses;
-  ChooseDatesRange({required this.removeFocuses});
-  //ChooseDatesRange({super.key});
+  const ChooseDatesRange({super.key, required this.removeFocuses});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +22,6 @@ class ChooseDatesRange extends StatelessWidget {
                       padding: MaterialStateProperty.all(EdgeInsets.all(15))
                   ),
                   onPressed: ()async{
-                    FocusScope.of(context).unfocus();
                     removeFocuses();
                     Map<String, DateTime?> map = await pickDateRange(context, homePageProvider.fromDate, homePageProvider.toDate);
                     homePageProvider.fromDate=map['fromDate'];
@@ -40,7 +37,6 @@ class ChooseDatesRange extends StatelessWidget {
                       padding: MaterialStateProperty.all(EdgeInsets.all(15))
                   ),
                   onPressed: ()async{
-                    FocusScope.of(context).unfocus();
                     removeFocuses();
                     Map<String, DateTime?> map = await pickDateRange(context, homePageProvider.fromDate, homePageProvider.toDate);
                     homePageProvider.fromDate=map['fromDate'];
