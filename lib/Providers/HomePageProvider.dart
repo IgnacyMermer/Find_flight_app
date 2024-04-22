@@ -2,9 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 class HomePageProvider extends ChangeNotifier{
   DateTime? fromDate_, toDate_, oneFlightDate_;
-  //TextEditingController flyFromController_ = new TextEditingController();
-  //TextEditingController flyToController_ = new TextEditingController();
-  int adults_=1, teenagers_=0, children_=0, babies_=0, flightClass_=-1;
+  int adults_=1, children_=0, babies_=0, flightClass_=-1;
   String airport_='', airportShortcut_='';
   bool isLoadingCities_=false, gettingFlights_=false;
 
@@ -13,10 +11,7 @@ class HomePageProvider extends ChangeNotifier{
   DateTime? get fromDate=>fromDate_;
   DateTime? get toDate=>toDate_;
   DateTime? get oneFlightDate=>oneFlightDate_;
-  //TextEditingController get flyFromController => flyFromController_;
-  //TextEditingController get flyToController => flyToController_;
   int get adults=>adults_;
-  int get teenagers=>teenagers_;
   int get children=>children_;
   int get babies=>babies_;
   int get flightClass=>flightClass_;
@@ -43,23 +38,8 @@ class HomePageProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  /*set flyFromController(TextEditingController newController){
-    flyFromController_=newController;
-    notifyListeners();
-  }
-
-  set flyToController(TextEditingController newController){
-    flyToController_=newController;
-    notifyListeners();
-  }*/
-
   set adults(int newAdults){
     adults_=newAdults;
-    notifyListeners();
-  }
-
-  set teenagers(int newTeenagers){
-    teenagers_=newTeenagers;
     notifyListeners();
   }
 

@@ -15,7 +15,7 @@ class LocalDatabase{
           onCreate: (Database db, int version) async {
             await db.execute(
                 'CREATE TABLE SAVES (id TEXT, lastTicketingDate TEXT, '
-                    'time TEXT, price TEXT, currency TEXT, totalPrice TEXT, numberOfBookableSeats INTEGER)');
+                    'time TEXT, currency TEXT, totalPrice TEXT, numberOfBookableSeats INTEGER)');
             await db.execute('CREATE TABLE SAVES_SEGMENTS(id INTEGER, departureCode TEXT, departureTerminal TEXT, '
                 'departureTime TEXT, arrivalCode TEXT, arrivalTerminal TEXT, arrivalTime TEXT, duration TEXT, '
                 'airplaneType TEXT)');
@@ -28,9 +28,9 @@ class LocalDatabase{
     var uuid = Uuid();
     String id = uuid.v4();
 
-    await database?.rawInsert('INSERT INTO SAVES(id, lastTicketingDate, time, price, currency, '
-        'totalPrice, numberOfBookableSeats) VALUES (?, ?, ?, ?, ?, ?, ?)', [id, flight?.lastTicketingDate,
-    flight?.time, flight?.price, flight?.currency, flight?.totalPrice, flight?.numberOfBookableSeats]);
+    await database?.rawInsert('INSERT INTO SAVES(id, lastTicketingDate, time, currency, '
+        'totalPrice, numberOfBookableSeats) VALUES (?, ?, ?, ?, ?, ?)', [id, flight?.lastTicketingDate,
+    flight?.time, flight?.currency, flight?.totalPrice, flight?.numberOfBookableSeats]);
 
     for(int i=0; i<(flight?.segments.length??0); i++){
       var segment = flight?.segments[i];
@@ -47,38 +47,38 @@ class LocalDatabase{
     final result = await database?.rawQuery('SELECT * FROM SAVES');
     final resultSegments = await database?.rawQuery('SELECT * FROM SAVES_SEGMENTS');
     List<Flight> flights = [];
-    print('result');
-    print(result);
-    print(resultSegments);
     result?.forEach((element) {
       List<FlightSegment> segments = [];
       String id = element['id'].toString();
-      print(id);
-      resultSegments?.forEach((elementSegm) {
-        if(elementSegm['id'].toString()==id) {
-          segments.add(
-              FlightSegment(
-                  elementSegm['departureCode'].toString(),
-                  elementSegm['departureTerminal'].toString(),
-                  elementSegm['departureTime'].toString(),
-                  elementSegm['arrivalCode'].toString(),
-                  elementSegm['arrivalTerminal'].toString(),
-                  elementSegm['arrivalTime'].toString(),
-                  elementSegm['duration'].toString(),
-                  elementSegm['airplaneType'].toString()
-              ));
-        }
-      });
+      try {
+        resultSegments?.forEach((elementSegm) {
+          if (elementSegm['id'].toString() == id) {
+            segments.add(
+                FlightSegment(
+                    elementSegm['departureCode'].toString(),
+                    elementSegm['departureTerminal'].toString(),
+                    elementSegm['departureTime'].toString(),
+                    elementSegm['arrivalCode'].toString(),
+                    elementSegm['arrivalTerminal'].toString(),
+                    elementSegm['arrivalTime'].toString(),
+                    elementSegm['duration'].toString(),
+                    elementSegm['airplaneType'].toString()
+                ));
+          }
+        });
 
-      if(segments.length!=0) {
-        flights.add(Flight(
-            element['lastTicketingDate'].toString(),
-            int.parse(element['numberOfBookableSeats'].toString()),
-            element['time'].toString(),
-            element['price'].toString(),
-            element['currency'].toString(),
-            element['totalPrice'].toString(),
-            segments));
+        if (segments.length != 0) {
+          flights.add(Flight(
+              element['lastTicketingDate'].toString(),
+              int.parse(element['numberOfBookableSeats'].toString()),
+              element['time'].toString(),
+              element['currency'].toString(),
+              element['totalPrice'].toString(),
+              segments));
+        }
+      }
+      catch(e){
+        print(e);
       }
     });
     return flights;

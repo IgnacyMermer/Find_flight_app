@@ -12,7 +12,6 @@ class AirportFields extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final homePageProvider = Provider.of<HomePageProvider>(context);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white60,

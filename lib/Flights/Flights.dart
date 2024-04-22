@@ -6,7 +6,7 @@ import 'package:lot_recrutation_app/Providers/TokenProvider.dart';
 
 class Flights{
   static Future<List<Flight>> getFlights(String departureId, String arrivalId, String date,
-      int adults, int page)async{
+      int adults, int children, int infants, int page)async{
 
     Dio dio = Dio();
 
@@ -22,12 +22,11 @@ class Flights{
       final result = await dio.get(
           'https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=${departureId
               .substring(1)}&destinationLocationCode=${arrivalId.substring(
-              1)}&departureDate=${date}&adults=${adults}&nonStop=false&max=${page*10}',
+              1)}&departureDate=${date}&adults=${adults}&children=${children}&infants=${infants}'
+              '&nonStop=false&max=${page*10}',
           options: Options(headers: {
             'Authorization': 'Bearer ${TokenProvider.token_}'
           }));
-
-      print(result);
 
       List<Flight> flights = [];
 
@@ -48,8 +47,8 @@ class Flights{
         });
 
         flights.add(Flight(element['lastTicketingDate'], element['numberOfBookableSeats'],
-            element['itineraries'][0]['duration'], element['price']['base'],
-            element['price']['currency'], element['price']['total'], segments));
+            element['itineraries'][0]['duration'], element['price']['currency'], element['price']['total'],
+            segments));
       });
       //gettingNewFlights=false;
       return flights;

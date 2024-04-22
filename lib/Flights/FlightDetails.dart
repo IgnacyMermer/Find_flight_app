@@ -4,11 +4,12 @@ import 'package:lot_recrutation_app/Database/Database.dart';
 import 'package:lot_recrutation_app/Flights/SearchPage.dart';
 import 'package:lot_recrutation_app/Models/Flight.dart';
 import 'package:lot_recrutation_app/Providers/FlightsProvider.dart';
+import 'package:lot_recrutation_app/Providers/HomePageProvider.dart';
 import 'package:provider/provider.dart';
 
 class FlightDetails extends StatefulWidget {
   final bool toTarget;
-  final Future<List<Flight>> Function(String, String, String, int, int) getFlights;
+  final Future<List<Flight>> Function(String, String, String, int, int, int, int) getFlights;
   const FlightDetails({super.key, required this.toTarget, required this.getFlights});
 
   @override
@@ -22,6 +23,7 @@ class _FlightDetailsState extends State<FlightDetails> {
   @override
   Widget build(BuildContext context) {
     final flightsProvider = Provider.of<FlightsProvider>(context);
+    final homePageProvider = Provider.of<HomePageProvider>(context);
     Flight? flight = flightsProvider.flightDetails;
     return PopScope(
       canPop: false,
@@ -95,10 +97,9 @@ class _FlightDetailsState extends State<FlightDetails> {
 
               SizedBox(height: 10),
 
-              Text('Cena (jedna osoba dorosła): ${flight?.price??'0'} ${flight?.currency??'EUR'}',
-              style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500)),
-
-              SizedBox(height: 10),
+              Text('Bilety: ${homePageProvider.adults}x dorosłych, ${homePageProvider.children}x dzieci '
+                  '${homePageProvider.babies}x niemowląt',
+                  style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w500)),
 
               Text('Wartość biletów: ${flight?.totalPrice??'0'} ${flight?.currency??'EUR'}',
                   style: TextStyle(color: Colors.black, fontSize: 25, fontWeight: FontWeight.w500)),
@@ -171,7 +172,7 @@ class _FlightDetailsState extends State<FlightDetails> {
                           child: Column(
                             children: [
                               Text('Lotnisko - Wylot'),
-                              Text('${e.departureCode}-${e.departureTerminal}')
+                              Text('${e.departureCode??''}-${e.departureTerminal??''}')
                             ],
                           )
                         ),
@@ -179,20 +180,22 @@ class _FlightDetailsState extends State<FlightDetails> {
                           child: Column(
                             children: [
                               Text('Wylot'),
-                              Text('${e.departureTime?.substring(0,16).replaceAll('T', ' ')}')
+                              Text('${e.departureTime?.substring(0,16).replaceAll('T', ' ')??''}')
                             ],
                           ),
                         )
                       ],
                     ),
+
                     SizedBox(height: 10),
+
                     Row(
                       children: [
                         Expanded(
                             child: Column(
                               children: [
                                 Text('Lotnisko - Przylot'),
-                                Text('${e.arrivalCode}-${e.arrivalTerminal}')
+                                Text('${e.arrivalCode??''}-${e.arrivalTerminal??''}')
                               ],
                             )
                         ),
@@ -200,14 +203,17 @@ class _FlightDetailsState extends State<FlightDetails> {
                           child: Column(
                             children: [
                               Text('Przylot'),
-                              Text('${e.arrivalTime?.substring(0,16).replaceAll('T', ' ')}')
+                              Text('${e.arrivalTime?.substring(0,16).replaceAll('T', ' ')??''}')
                             ],
                           ),
                         )
                       ],
                     ),
+
                     SizedBox(height: 20),
+
                     Divider(height: 2, thickness: 10,),
+
                     SizedBox(height: 20),
                   ],
                 ),

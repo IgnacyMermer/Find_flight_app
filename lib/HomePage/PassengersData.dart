@@ -24,11 +24,9 @@ class PassengersData extends StatelessWidget {
           removeFocuses();
 
           Map<String, int> userChosenPassengersData = await passengersDataConfigurator(context, {'adults': homePageProvider.adults,
-            'teenagers': homePageProvider.teenagers, 'children': homePageProvider.children,
-            'babies': homePageProvider.babies, 'flightClass': homePageProvider.flightClass_});
+            'children': homePageProvider.children, 'babies': homePageProvider.babies, 'flightClass': homePageProvider.flightClass_});
 
           homePageProvider.adults=userChosenPassengersData['adults']!;
-          homePageProvider.teenagers=userChosenPassengersData['teenagers']!;
           homePageProvider.children=userChosenPassengersData['children']!;
           homePageProvider.babies=userChosenPassengersData['babies']!;
           homePageProvider.flightClass=userChosenPassengersData['flightClass']!;
@@ -80,42 +78,6 @@ class PassengersData extends StatelessWidget {
                             onPressed: (){
                               setState((){
                                 editablePassengerData['adults']=editablePassengerData['adults']!+1;
-                              });
-                            },
-                            icon: Icon(Icons.add)
-                        ),
-
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 20, horizontal: 0),
-                    child: Row(
-                      children: [
-                        Icon(Icons.person),
-                        Expanded(
-                          child:Column(
-                            children: [
-                              Text('Nastolatkowie'),
-                              Text('12-16 lat')
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                            onPressed: (){
-                              if(editablePassengerData['teenagers']!=0){
-                                setState((){
-                                  editablePassengerData['teenagers']=editablePassengerData['teenagers']!-1;
-                                });
-                              }
-                            },
-                            icon: Icon(Icons.remove)
-                        ),
-                        Text(editablePassengerData['teenagers'].toString()),
-                        IconButton(
-                            onPressed: (){
-                              setState((){
-                                editablePassengerData['teenagers']=editablePassengerData['teenagers']!+1;
                               });
                             },
                             icon: Icon(Icons.add)

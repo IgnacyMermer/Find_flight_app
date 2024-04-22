@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:lot_recrutation_app/Database/Database.dart';
 import 'package:lot_recrutation_app/Flights/Flights.dart';
-import 'package:lot_recrutation_app/Flights/SavesFlights.dart';
 import 'package:lot_recrutation_app/Flights/SearchPage.dart';
 import 'package:lot_recrutation_app/HomePage/AirportsFields.dart';
 import 'package:lot_recrutation_app/HomePage/ChooseDatesRange.dart';
@@ -193,8 +192,8 @@ class _HomePageState extends State<HomePage> {
                           ),
                           onPressed: (){
                             Future<List<Flight>> getFlights(String departureId, String arrivalId, String date,
-                                int adults, int page)async {
-                              final result = await Flights.getFlights(departureId, arrivalId, date, adults, page);
+                                int adults, int children, int infants, int page)async {
+                              final result = await Flights.getFlights(departureId, arrivalId, date, adults, children, infants, page);
                               homePageProvider.gettingFlights=false;
                               return result;
 
@@ -247,7 +246,9 @@ class _HomePageState extends State<HomePage> {
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                       ),
-                                      child: Text(e['name']!, style: TextStyle(color: Colors.black))
+                                      padding: EdgeInsets.all(5),
+                                      child: Text(e['name']!,
+                                        style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w500))
                                     ),
                                   );
                                 }).toList(),
@@ -278,9 +279,6 @@ class _HomePageState extends State<HomePage> {
                                         showToWhereCities=false;
                                         flyToController.text = e['name']!;
                                         homePageProvider.airportToId=e['id']!;
-                                        print(homePageProvider.airportToId);
-                                        print('homePageProvider.airportToId');
-                                        print(e['id']);
                                       });
                                     },
                                     child: Container(
@@ -289,7 +287,9 @@ class _HomePageState extends State<HomePage> {
                                         decoration: BoxDecoration(
                                           color: Colors.white,
                                         ),
-                                        child: Text(e['name']!, style: TextStyle(color: Colors.black))
+                                        padding: EdgeInsets.all(5),
+                                        child: Text(e['name']!,
+                                          style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w500))
                                     ),
                                   );
                                 }).toList(),
@@ -308,27 +308,21 @@ class _HomePageState extends State<HomePage> {
                     padding: MaterialStateProperty.all(EdgeInsets.all(15))
                 ),
                 onPressed: (){
-                  if(homePageProvider.airportFromId!=null&&
-                      homePageProvider.airportToId!=null&&
-                      ((oneWay&&homePageProvider.oneFlightDate!=null)||
-                          ((!oneWay)&&homePageProvider.toDate!=null&&
-                              homePageProvider.fromDate!=null))) {
+                  flightsProvider.toAndFromFlights = !oneWay;
+                  Future<List<Flight>> getFlights(String departureId, String arrivalId, String date,
+                      int adults, int children, int infants, int page)async {
+                    await LocalDatabase.checkDatabase();
+                    final result = await LocalDatabase.getData();
+                    homePageProvider.gettingFlights=false;
+                    return result;
 
-                    flightsProvider.toAndFromFlights = !oneWay;
-                    Future<List<Flight>> getFlights(String departureId, String arrivalId, String date,
-                        int adults, int page)async {
-                      await LocalDatabase.checkDatabase();
-                      final result = await LocalDatabase.getData();
-                      homePageProvider.gettingFlights=false;
-                      return result;
-
-                    }
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            SearchPage(toTarget: false, oneWayFlight: true,
-                                getFlights: getFlights))
-                    );
                   }
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          SearchPage(toTarget: false, oneWayFlight: true,
+                              getFlights: getFlights))
+                  );
+
                 },
                 child: Text('Zapisane loty', style: TextStyle(fontSize: 25))
               )

@@ -56,11 +56,25 @@ class ChooseDatesRange extends StatelessWidget {
     final DateTimeRange? picked = await showDateRangePicker(
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(Duration(days: 365)),
-      initialDateRange: fromDate!=null&&toDate!=null?DateTimeRange(start: fromDate??DateTime.now(), end: toDate??DateTime.now())
+      initialDateRange: fromDate!=null&&toDate!=null?DateTimeRange(start: fromDate, end: toDate)
       :null,
       context: context,
       barrierColor: Colors.black,
-
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: Colors.grey,
+              onPrimary: Colors.white,
+              onSurface: Colors.white,
+              primaryContainer: Colors.grey,
+              secondary: Colors.grey
+            ),
+            dialogBackgroundColor: Colors.blueGrey,
+          ),
+          child: child!,
+        );
+      },
     );
 
     DateTime? newFromDate = fromDate, newToDate = toDate;
