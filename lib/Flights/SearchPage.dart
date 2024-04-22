@@ -58,6 +58,8 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final flightsProvider = Provider.of<FlightsProvider>(context);
+    final homePageProvider = Provider.of<HomePageProvider>(context);
     return PopScope(
       canPop: false,
       onPopInvoked: (didPop) async {
@@ -104,7 +106,12 @@ class _SearchPageState extends State<SearchPage> {
                     return const SpinKitFoldingCube(color: Colors.black,);
                   }
                 })
-              )
+              ),
+
+              homePageProvider.gettingFlights?SpinKitFoldingCube(color: Colors.black,):SizedBox(),
+
+              SizedBox(height: 20),
+
             ],
           ),
         ),

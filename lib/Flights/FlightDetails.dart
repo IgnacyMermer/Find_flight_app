@@ -72,7 +72,7 @@ class _FlightDetailsState extends State<FlightDetails> {
                           onPressed: ()async{
                             await showToureDetails(context, flight);
                           },
-                          child: Text('Szczegóły')
+                          child: Text('Szczegóły', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500))
                         )
                       ],
                     )
@@ -172,7 +172,7 @@ class _FlightDetailsState extends State<FlightDetails> {
                           child: Column(
                             children: [
                               Text('Lotnisko - Wylot'),
-                              Text('${e.departureCode??''}-${e.departureTerminal??''}')
+                              Text('${e.departureCode??''}${e.departureTerminal!='null'?'-${e.departureTerminal}':''}')
                             ],
                           )
                         ),
@@ -195,7 +195,7 @@ class _FlightDetailsState extends State<FlightDetails> {
                             child: Column(
                               children: [
                                 Text('Lotnisko - Przylot'),
-                                Text('${e.arrivalCode??''}-${e.arrivalTerminal??''}')
+                                Text('${e.arrivalCode??''}${e.arrivalTerminal!='null'?'-${e.arrivalTerminal}':''}')
                               ],
                             )
                         ),

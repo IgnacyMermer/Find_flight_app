@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:lot_recrutation_app/Database/Database.dart';
 import 'package:lot_recrutation_app/Flights/Flights.dart';
@@ -9,10 +7,10 @@ import 'package:lot_recrutation_app/HomePage/AirportsFields.dart';
 import 'package:lot_recrutation_app/HomePage/ChooseDatesRange.dart';
 import 'package:lot_recrutation_app/HomePage/ChooseFlightDate.dart';
 import 'package:lot_recrutation_app/HomePage/PassengersData.dart';
+import 'package:lot_recrutation_app/Models/City.dart';
 import 'package:lot_recrutation_app/Models/Flight.dart';
 import 'package:lot_recrutation_app/Providers/FlightsProvider.dart';
 import 'package:lot_recrutation_app/Providers/HomePageProvider.dart';
-import 'package:lot_recrutation_app/Providers/TokenProvider.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -41,7 +39,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         showFromWhereCities = true;
         showToWhereCities = false;
-        cities = getCities(flyFromController.text);
+        cities = City.getCities(flyFromController.text);
       });
     });
   }
@@ -53,7 +51,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         showFromWhereCities = false;
         showToWhereCities = true;
-        cities = getCities(flyToController.text);
+        cities = City.getCities(flyToController.text);
       });
     });
   }
@@ -119,8 +117,8 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     AnimatedPositioned(
                       duration: Duration(milliseconds: 300),
-                      left: oneWay ? 0 : 180, // Assumes the container is 300px wide
-                      right: oneWay ? 180 : 0,
+                      left: oneWay ? 0 : MediaQuery.of(context).size.width*0.43,
+                      right: oneWay ? MediaQuery.of(context).size.width*0.43 : 0,
                       child: Container(
                         width: 150,
                         height: 50,
@@ -178,7 +176,7 @@ class _HomePageState extends State<HomePage> {
                       oneWay?ChooseFlightDate(removeFocuses: removeFocuses)
                           :ChooseDatesRange(removeFocuses: removeFocuses),
 
-                      PassengersData(removeFocuses: removeFocuses),
+                      PassengersData(),
 
                       Container(
                         decoration: BoxDecoration(
@@ -227,7 +225,7 @@ class _HomePageState extends State<HomePage> {
                             top: 90,
                             child: Container(
                               width: 140,
-                              height: 200,
+                              height: (snapshot.data??[]).length==0?0:200,
                               child: ListView(
                                 shrinkWrap: true,
                                 children: (snapshot.data??[]).map((e) {
@@ -268,7 +266,7 @@ class _HomePageState extends State<HomePage> {
                             top: 215,
                             child: Container(
                               width: 140,
-                              height: 200,
+                              height: (snapshot.data??[]).length==0?0:200,
                               child: ListView(
                                 shrinkWrap: true,
                                 children: (snapshot.data??[]).map((e) {
@@ -331,36 +329,5 @@ class _HomePageState extends State<HomePage> {
         ),
       )
     );
-  }
-
-  Future<List<Map<String, String>>> getCities(String keyword)async{
-    Dio dio = Dio();
-    try {
-      if(TokenProvider.token_==null){
-        TokenProvider.token_ = await TokenProvider.createToken(dio);
-        TokenProvider.tokenCreatedTime_=DateTime.now();
-      }
-      else if((TokenProvider.tokenCreatedTime_??DateTime(2023, 1, 1)).isBefore(DateTime.now().subtract(Duration(minutes: 30)))){
-        TokenProvider.token_ = await TokenProvider.createToken(dio);
-        TokenProvider.tokenCreatedTime_=DateTime.now();
-      }
-
-      final data = await dio.get(
-          'https://test.api.amadeus.com/v1/reference-data/locations?subType=AIRPORT&keyword=${keyword}',
-          options: Options(headers: {
-            'Authorization': 'Bearer ${TokenProvider.token_}'
-          }));
-      List<dynamic> responseData = data.data['data'];
-      List<Map<String, String>> cities = [];
-      responseData.forEach((element) {
-        cities.add({'name':'${element['name']} (${element['id']}) - ${element['address']['cityName']}',
-        'id': '${element['id']}'});
-      });
-      return cities;
-    }
-    catch(e){
-      print(e);
-    }
-    return [];
   }
 }
