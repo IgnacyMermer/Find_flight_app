@@ -11,4 +11,5 @@
 - sqflite
 - uuid
 
+#### Aby uruchomić aplikację należy dodać plik lib/Keys/Api.dart, w którym należy umieścic zmienne final apiKey oraz final secretKey (z developer.amadeus.com).
 ##### Do aplikacji zostały dodane również proste testy.
