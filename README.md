@@ -1,16 +1,14 @@
-# lot_recrutation_app
+## Aplikacja pozwala na znajdowanie połączeń lotniczych pomiędzy wybranymi lotniskami
 
-A new Flutter project.
+#### W aplikacji należy na samym początku wpisać miasto lotniska wylotu i przylotu i wybrać odpowiednie lotniska. Następnie należy wybrać datę lub zakres dat w których użytkownik planuje odbyć podróż. Można również wybrać ilość pasażerów, aby program obliczył koszt wycieczki. 
+#### Po naciśnięciu przycisku Szukaj wyświetli się 10 najbardziej odpowiadających połączęń, przy scrollowaniu do dołu ekranu będą ładować się kolejne loty.
+#### Dzięki skorzystaniu z bazy danych sqlite istnieje możliwość zapisywania lotów do lokalnej pamięci urządzenia. Ta opcja jest dostępna po wejściu w szczegóły lotu. W tym samym miejscu jest również możliwe znalezenie lotu powrotnego, gdy na początku został wybrany zakres dat podróży.
 
-## Getting Started
+### Do stworzenia aplikacji wykorzystałem takie biblioteki jak:
+- Dio
+- provider
+- flutter_spinkit
+- sqflite
+- uuid
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+##### Do aplikacji zostały dodane również proste testy.
